@@ -62,4 +62,8 @@ public class RegisterService {
     private String generateUUID() {
         return UUID.randomUUID().toString();
     }
+
+    public void enableUserAccount(String token) {
+
+    }
 }

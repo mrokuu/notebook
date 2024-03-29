@@ -15,7 +15,10 @@ public class RegisterDtoMapper {
                 .email(registerDTO.getEmail())
                 .activationToken(token)
                 .build();
+
     }
+
+
 
 
 }

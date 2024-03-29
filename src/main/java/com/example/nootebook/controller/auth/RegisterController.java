@@ -1,9 +1,7 @@
 package com.example.nootebook.controller.auth;
 
 import com.example.nootebook.dto.RegisterDTO;
-import com.example.nootebook.exception.EmailAlreadyExistsException;
-import com.example.nootebook.exception.PasswordDoNotMatch;
-import com.example.nootebook.exception.UsernameAlreadyExistsException;
+import com.example.nootebook.exception.*;
 import com.example.nootebook.service.RegisterService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -45,5 +43,17 @@ public class RegisterController {
             }
         }
         return "register";
+    }
+
+
+    @GetMapping("/activation")
+    public String activateUserAccount(@RequestParam(value = "token", defaultValue = "") String token, Model model) {
+        try {
+            registerService.enableUserAccount(token);
+            model.addAttribute("enableAccountSuccess", true);
+        } catch (ActivationTimeExpiredException | UserNotFoundException exception) {
+            model.addAttribute("error", exception.getMessage());
+        }
+        return "activate-account";
     }
 }
