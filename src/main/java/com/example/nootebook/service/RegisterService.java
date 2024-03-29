@@ -6,6 +6,7 @@ import com.example.nootebook.dto.RegisterDTO;
 import com.example.nootebook.exception.EmailAlreadyExistsException;
 import com.example.nootebook.exception.PasswordDoNotMatch;
 import com.example.nootebook.exception.UsernameAlreadyExistsException;
+import com.example.nootebook.mapper.RegisterDtoMapper;
 import com.example.nootebook.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class RegisterService {
         if (checkPasswordRepeatCorrect(registerDTO)) {
             if (checkUserExsists(registerDTO.getUsername(), registerDTO.getEmail())) {
                 String token = generateUUID();
-                emailService.sendEmail(registerDTO.getEmail(), token, "REGISTERUSER");
+//                emailService.sendEmail(registerDTO.getEmail(), token, "REGISTERUSER");
                 User user = RegisterDtoMapper.mapToUser(registerDTO, token);
                 user.setActivationTokenExpiredDate(LocalDateTime.now().plusMinutes(15));
                 encodePasswordAndSaveToDB(user);
