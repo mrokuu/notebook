@@ -3,9 +3,7 @@ package com.example.nootebook.service;
 import com.example.nootebook.config.PasswordEncoder;
 import com.example.nootebook.domain.User;
 import com.example.nootebook.dto.RegisterDTO;
-import com.example.nootebook.exception.EmailAlreadyExistsException;
-import com.example.nootebook.exception.PasswordDoNotMatch;
-import com.example.nootebook.exception.UsernameAlreadyExistsException;
+import com.example.nootebook.exception.*;
 import com.example.nootebook.mapper.RegisterDtoMapper;
 import com.example.nootebook.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -63,7 +61,25 @@ public class RegisterService {
         return UUID.randomUUID().toString();
     }
 
-    public void enableUserAccount(String token) {
-
+    public void enableUserAccount(String token) throws ActivationTimeExpiredException, UserNotFoundException {
+        User user = userRepository.findByActivationToken(token);
+        if (user != null) {
+            if (checkActivationTime(user.getActivationTokenExpiredDate())) {
+                user.setActivationToken(null);
+                user.setActivationTokenExpiredDate(null);
+                user.setEnabled(true);
+                userRepository.save(user);
+            } else {
+                userRepository.deleteById(user.getId());
+                throw new ActivationTimeExpiredException("Czas aktywacji konta wygasł, zarejestruj się ponownie");
+            }
+        } else {
+            throw new UserNotFoundException("Wystąpił błąd, nie odnaleziono tokenu aktywacyjnego.");
+        }
     }
+
+    private boolean checkActivationTime(LocalDateTime userTime) {
+        return LocalDateTime.now().isBefore(userTime);
+    }
+
 }
